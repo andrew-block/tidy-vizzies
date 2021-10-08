@@ -1,29 +1,38 @@
-# Clear space 
+# Clear space
 rm(list=ls())
 gc()
 
 library(tidyverse)
-# Load data: 
+library(gtExtras)
+library(gt)
+
+
+# Load data:
 # Pro sports vaccinations
 psv <- readr::read_csv('https://raw.githubusercontent.com/andrew-block/tidy-vizzies/main/pro_sports_vaccinations/data/sep_2021_pro_sports_vaccinations.csv')
 
-# Load {gt}
-library(gt)
+psv_t <- psv %>%
+  mutate(Sports_Logo = Sport, .before = September_2021_Vaccination_Rate) %>%
+  mutate(Sports_Logo = case_when(
+    str_detect(Sports_Logo,'NHL') ~ 'https://raw.githubusercontent.com/andrew-block/tidy-vizzies/main/pro_sports_vaccinations/images/logo_nhl.png',
+    str_detect(Sports_Logo,'NFL') ~ 'https://raw.githubusercontent.com/andrew-block/tidy-vizzies/main/pro_sports_vaccinations/images/logo_nfl.png',
+    str_detect(Sports_Logo,'WNBA') ~ 'https://raw.githubusercontent.com/andrew-block/tidy-vizzies/main/pro_sports_vaccinations/images/logo_wnba.png',
+    str_detect(Sports_Logo,'NBA') ~ 'https://raw.githubusercontent.com/andrew-block/tidy-vizzies/main/pro_sports_vaccinations/images/logo_nba.png',
+    str_detect(Sports_Logo,'MLS') ~ 'https://raw.githubusercontent.com/andrew-block/tidy-vizzies/main/pro_sports_vaccinations/images/logo_mls.png',
+    str_detect(Sports_Logo,'MLB') ~ 'https://raw.githubusercontent.com/andrew-block/tidy-vizzies/main/pro_sports_vaccinations/images/logo_mlb.png'
+  ))
+
 
 # Make table with gt()
-psv_t<-psv %>%
+psv_gt <- psv_t %>%
   # Make table
-  gt()
+  gt() %>%
 
-# Load extension
-library(gtExtras)
-# Apply 'New York Times' theme
-psv_t<-psv_t%>%
-  gtExtras::gt_theme_nytimes()
+  # Apply 'New York Times' theme
+  gtExtras::gt_theme_nytimes() %>%
 
-psv_t
+  gtExtras::gt_img_rows(columns = Sports_Logo, height = 20) %>%
 
-psv_t<-psv_t %>%
   # Add title and subtitle
   tab_header(
     title = "US Professonal Sports Vaccination Rates",
@@ -34,6 +43,7 @@ psv_t<-psv_t %>%
   cols_label(
     September_2021_Vaccination_Rate = "Vaccination Rate",
     Unvaccinated_Players = "Unvaccinated Players",
+    Sports_Logo = "  ",
     Unvaccinated_Players_Team = "Unvaccinated PPT"
   ) %>%
   tab_footnote(
@@ -65,4 +75,4 @@ psv_t<-psv_t %>%
     locations = cells_column_labels(columns = everything())
   )
 
-psv_t
+psv_gt
