@@ -37,7 +37,7 @@ fcs_t <- fcs %>%
   tab_header(
     title = "FCS Meta Power Ranking",
     # Use markdown syntax with md()
-    subtitle = md("Week **7**")
+    subtitle = md("Week 7")
   ) %>%
   tab_footnote(
     footnote = "Strength of Schedule",
@@ -49,7 +49,11 @@ fcs_t <- fcs %>%
     columns = c(combo)
   ) %>%
   tab_options(
-    data_row.padding = px(5)
+    data_row.padding = px(5),
+    heading.title.font.size = px(40),
+    heading.title.font.weight = "bolder",
+    heading.subtitle.font.size =  px(20),
+    footnotes.font.size = px(12)
   ) %>%
   cols_label(
     logo = "  ",
@@ -118,7 +122,7 @@ fcs_t <- fcs %>%
   ) %>%
   cols_align(
     align = "center",
-    columns = c(record, macro_ranking, change)
+    columns = c(record, macro_ranking, change, dr_index, cfp_index, vs_index, sos)
   ) %>%
   data_color(
     columns = sos,
