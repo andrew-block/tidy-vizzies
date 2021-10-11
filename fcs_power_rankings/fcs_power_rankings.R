@@ -6,6 +6,7 @@ library(tidyverse)
 library(gtExtras)
 library(gt)
 
+
 # function to incorporate player name + conference
 combine_word <- function(name, conference){
   glue::glue(
@@ -23,8 +24,7 @@ fcs_t <- fcs %>%
     combo = combine_word(team, conference),
     combo = map(combo, gt::html)
   ) %>%
-  select(combo, logo, record, macro_ranking, change,
-         dr_index, cfp_index, vs_index, sos) %>%
+  select(combo, logo, record, macro_ranking, change, dr_index, cfp_index, vs_index, sos) %>%
   # Make table
   gt() %>%
 
@@ -46,7 +46,7 @@ fcs_t <- fcs %>%
   ) %>%
   cols_align(
     align = "left",
-    columns = vars(combo)
+    columns = c(combo)
   ) %>%
   tab_options(
     data_row.padding = px(5)
@@ -79,12 +79,54 @@ fcs_t <- fcs %>%
 
     }
   ) %>%
+  gt_highlight_rows(rows = macro_ranking == 1, fill = "yellow", alpha = 0.25) %>%
   tab_spanner(
     label = "Rank Sources",
     columns = c(
       dr_index, cfp_index, vs_index)
   ) %>%
   tab_source_note(
-    source_note = "From versussportssimulator.com, collegefootballpoll.com, dratings.com"
-  )
-fcs_t
+    source_note = html(
+      htmltools::tags$a(
+        href = "https://www.versussportssimulator.com/FCS/rankings",
+        target = "_blank",
+        "Versus Sports Simulator"
+      ) %>%
+        as.character()
+    )) %>%
+  tab_source_note(
+    source_note = html(
+      htmltools::tags$a(
+        href = "https://www.collegefootballpoll.com/fcs/rankings/",
+        target = "_blank",
+        "College Football Poll"
+      ) %>%
+        as.character()
+    )) %>%
+  tab_source_note(
+    source_note = html(
+      htmltools::tags$a(
+        href = "https://www.dratings.com/sports/ncaa-fcs-football-ratings/",
+        target = "_blank",
+        "DRatings"
+      ) %>%
+        as.character()
+    )) %>%
+  fmt_number(
+    columns = vars(dr_index),
+    decimals = 2
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = c(record, macro_ranking, change)
+  ) %>%
+  data_color(
+    columns = sos,
+    colors = scales::col_numeric(
+      c("#084081", "#0868ac", "#2b8cbe",
+        "#4eb3d3", "#7bccc4", "#a8ddb5",
+        "#ccebc5", "#e0f3db", "#f7fcf0"),
+      domain = NULL
+    )
+    )
+  fcs_t
