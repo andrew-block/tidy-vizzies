@@ -35,7 +35,7 @@ fcs_t <- fcs %>%
 
   # Add title and subtitle
   tab_header(
-    title = "FCS Meta Power Ranking",
+    title = "FCS Meta Power Rankings",
     # Use markdown syntax with md()
     subtitle = md("Week 7")
   ) %>%
