@@ -23,8 +23,8 @@ fcs_t <- fcs %>%
     combo = combine_word(team, conference),
     combo = map(combo, gt::html)
   ) %>%
-  select(combo, logo, record, macro_ranking,
-         dr_index, cfp_index, vs_index,change, sos) %>%
+  select(combo, logo, record, macro_ranking, change,
+         dr_index, cfp_index, vs_index, sos) %>%
   # Make table
   gt() %>%
 
@@ -40,24 +40,9 @@ fcs_t <- fcs %>%
     subtitle = md("Week **7**")
   ) %>%
   tab_footnote(
-    footnote = "SOS = Strength of Schedule",
+    footnote = "Strength of Schedule",
     locations = cells_column_labels(
       columns = sos)
-    ) %>%
-  tab_footnote(
-    footnote = "DRating",
-    locations = cells_column_labels(
-      columns = dr_index)
-  ) %>%
-  tab_footnote(
-    footnote = "College Football Poll",
-    locations = cells_column_labels(
-      columns = cfp_index)
-  ) %>%
-  tab_footnote(
-    footnote = "Versus Sports Simulator",
-    locations = cells_column_labels(
-      columns = vs_index)
   ) %>%
   cols_align(
     align = "left",
@@ -74,19 +59,32 @@ fcs_t <- fcs %>%
     vs_index = "VS",
     macro_ranking = "Rank"
   ) %>%
-  data_color(
-    columns = vars(change),
-    colors = scales::col_numeric(
-      palette = c("red", "green"),
-      domain = NULL
-    )
-  ) %>%
-  tab_source_note(
-    source_note = "Meta ranking aggregated using several different websites (Rank Sources)"
+  text_transform(
+    locations = cells_body(columns = change),
+    fn = function(x){
+
+      change <- as.integer(x)
+
+      choose_logo <-function(x){
+        if (x == 0){
+          gt::html(fontawesome::fa("equals", fill = "#696969"))
+        } else if (x > 0){
+          gt::html(glue::glue("<span style='color:#191970;font-face:bold;font-size:10px;'>{x}</span>"), fontawesome::fa("arrow-up", fill = "#1134A6"))
+        } else if (x < 0) {
+          gt::html(glue::glue("<span style='color:#DA2A2A;font-face:bold;font-size:10px;'>{x}</span>"), fontawesome::fa("arrow-down", fill = "#DA2A2A"))
+        }
+      }
+
+      map(change, choose_logo)
+
+    }
   ) %>%
   tab_spanner(
     label = "Rank Sources",
     columns = c(
       dr_index, cfp_index, vs_index)
+  ) %>%
+  tab_source_note(
+    source_note = "From versussportssimulator.com, collegefootballpoll.com, dratings.com"
   )
 fcs_t
