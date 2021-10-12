@@ -7,11 +7,10 @@ library(gtExtras)
 library(gt)
 
 
-# function to incorporate player name + conference
-combine_word <- function(name, conference){
+stack_word <- function(word_1, word_2){
   glue::glue(
-    "<div style='line-height:10px'><span style='font-weight:bold;font-variant:small-caps;font-size:14px'>{name}</div>
-    <div style='line-height:12px'><span style ='font-weight:bold;color:grey;font-size:10px'>{conference}</span></div>"
+    "<div style='line-height:10px'><span style='font-weight:bold;font-variant:small-caps;font-size:14px'>{word_1}</div>
+    <div style='line-height:12px'><span style ='font-weight:bold;color:grey;font-size:10px'>{word_2}</span></div>"
   )
 }
 
@@ -21,7 +20,7 @@ fcs <- readr::read_csv('https://raw.githubusercontent.com/andrew-block/tidy-vizz
 fcs_t <- fcs %>%
   select(team,logo,conference,record,macro_ranking,change,dr_index,cfp_index,vs_index,sos) %>%
   mutate(
-    combo = combine_word(team, conference),
+    combo = stack_word(team, conference),
     combo = map(combo, gt::html)
   ) %>%
   select(combo, logo, record, macro_ranking, change, dr_index, cfp_index, vs_index, sos) %>%
