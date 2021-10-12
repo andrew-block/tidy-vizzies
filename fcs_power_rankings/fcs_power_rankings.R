@@ -77,9 +77,7 @@ fcs_t <- fcs %>%
           gt::html(glue::glue("<span style='color:#DA2A2A;font-face:bold;font-size:10px;'>{x}</span>"), fontawesome::fa("arrow-down", fill = "#DA2A2A"))
         }
       }
-
       map(change, choose_logo)
-
     }
   ) %>%
   gt_highlight_rows(rows = macro_ranking == 1, fill = "yellow", alpha = 0.25) %>%
