@@ -33,8 +33,6 @@ crypto <-
 
 crypto <- crypto[crypto$Low != 0, ]
 
-
-
 stand_density +
   scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
   coord_cartesian(xlim = c(-7500, 8000)) +
@@ -50,8 +48,8 @@ stand_density +
   labs(
     x = "Point Differential", y = "",
     title = "Playoff teams typically have a positive point differential",
-    subtitle = "Data through week 15 of the 2020 NFL Season",
-    caption = "Plot: @thomas_mock | Data: ESPN"
+    subtitle = "Data",
+    caption = "Plot"
   )
 
 stand_density
