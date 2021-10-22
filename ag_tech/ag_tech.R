@@ -27,7 +27,7 @@ agt <- ag %>%
   select(Organization, Logo, Total_Employees, Funding_Rounds,
          Last_Funding_Date, Last_Funding_Amount, Last_Funding_Type) %>%
   gt() %>%
-  gtExtras::gt_theme_538() %>%
+  gtExtras::gt_theme_nytimes() %>%
   gtExtras::gt_img_rows(columns = Logo, height = 20) %>%
   tab_header(
     title = "AgTech Leaders",
