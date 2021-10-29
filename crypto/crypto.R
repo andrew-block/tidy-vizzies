@@ -1,55 +1,37 @@
 library(tidyverse)
-library(gtExtras)
-library(gt)
-library(dplyr)
 library(ggridges)
-library(ggthemes)
-library(ggtext)
+library(lubridate)
+library(scales)
 
-rm(list = ls())
+btc_daily_raw <- readr::read_csv('https://raw.githubusercontent.com/andrew-block/tidy-vizzies/main/crypto/data/gemini_BTCUSD_day.csv')
 
-btc <- readr::read_csv('https://raw.githubusercontent.com/andrew-block/tidy-vizzies/main/crypto/data/gemini_BTCUSD_day.csv')
+btc_daily <- btc_daily_raw[order(btc_daily_raw$Symbol, btc_daily_raw$Unix),]
+btc_daily$Year <- format(btc_daily$Date, format="%Y")
 
-
-btc <- btc[order(btc$Symbol, btc$Unix),]
-btc$Year <- format(btc$Date, format="%Y")
-
-crypto <-
-  btc %>%
+btc_daily <-
+  btc_daily %>%
     group_by(Symbol) %>%
     mutate(
       Daily_Change = (Close - lag(Close)),
-      Change = case_when(
-        Daily_Change > 0 ~ "Positive",
-        Daily_Change <= 0 ~ "Negative"
-      ),
-      Color = case_when(
-        Daily_Change > 0 ~ "#D50A0A",
-        Daily_Change <= 0 ~ "#013369"
-      ),
       Yesterday = lag(Close),
-      Percent_Change = Daily_Change/Yesterday
+      Daily_Percent_Change = Daily_Change/Yesterday
     )
 
-crypto <- crypto[crypto$Low != 0, ]
-
-stand_density +
-  scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
-  coord_cartesian(xlim = c(-7500, 8000)) +
-  ggtext::geom_richtext(
-    data = crypto,
-    aes(x = Percent_Change, y = Daily_Change, color = Color),
-    fill = "#f0f0f0", label.color = NA, # remove background and outline
-    label.padding = grid::unit(rep(0, 4), "pt"), # remove padding
-    family = "Chivo", hjust = 0 , fontface = "bold",
-    size = 6
-  ) +
-  theme(panel.grid.major.y = element_blank()) +
-  labs(
-    x = "Point Differential", y = "",
-    title = "Playoff teams typically have a positive point differential",
-    subtitle = "Data",
-    caption = "Plot"
+btc_monthly <- filter(btc_daily, mday(Date)== 1 & year(Date) >= 2016) %>%
+  mutate(
+    Monthly_Change = (Close - lag(Close)),
+    Monthly_Percent_Change = Monthly_Change/Yesterday,
+    Value = case_when(Monthly_Change>=0 ~ "Positive", Monthly_Change<0 ~ "Negative")
   )
-
-stand_density
+ggplot(btc_monthly, aes(x = Monthly_Percent_Change, y = Year, fill = stat(x), point_shape = Value, point_color = Value)) +
+  geom_density_ridges_gradient(
+    scale = 2.5, rel_min_height = 0.01, jittered_points = TRUE,
+    alpha = 0.7, point_size = 1, point_alpha = 1) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, .1)) +
+  scale_x_continuous(labels = scales::percent) +
+  scale_fill_viridis_c(labels = scales::percent_format(), option = "B") +
+  xlab('Monthly Price Movement') +
+  labs(fill = "% Change") +
+  coord_cartesian(clip = "off") +
+  labs(title = 'Bitcoin (BTC) Monthly Price Change 2016 - 2021')
